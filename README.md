@@ -19,8 +19,8 @@ The elements of this project include:
 
 The metadata used to generate Figure 1 is “allsets_rapid_tools_0331.csv” and Figure 2 is “primers_specific_unique_cleaned_0331.csv”. These files contain every metric collected from the 70 papers: 
 
-*Allsets_rapid_tools_0331 file:* paper_doi, citation (first author’s name), source (Wos Search or snowball), title, year, country_first_author_c, country_last_author_c, country_origin_samples_c, nagoya_protocol_c (yes, no, or not specified), primer_developed_c (applied, developed, both), application_primer (eDNA or Tissue DNA), Rapid_DNAtools_c (Multiplex PCR, Droplet Digital PCR, PCR RFLP, etc), on-site_identification_device, RapidDNAtools_develop_c (applied, developed, both), OBS, Rapid_tool_reference 
- 
+*Allsets_rapid_tools_0331 file:* paper_doi, citation (first author’s name), source (Wos Search or snowball), title, year, country_first_author_c, country_last_author_c, country_origin_samples_c, nagoya_protocol_c (yes, no, or not specified), primer_developed_c (applied, developed, both), application_primer (eDNA or Tissue DNA), Rapid_DNAtools_c (Multiplex PCR, Droplet Digital PCR, PCR RFLP, etc), on-site_identification_device, RapidDNAtools_develop_c (applied, developed, both), OBS, Rapid_tool_reference
+
 *Primers_specific_unique_cleaned_0331 file:* paper_doi, citation (first author’s name), purpose (rapid_tools or just primer), rapid_DNAtools, application (eDNA or Tissue DNA), primer_name, primer_type (F or R), primer_sequence, developed_OR_applied (applied, developed or both), primer_citation, test_method (lab experiment or in silico), molecular_marker (e.g., ND2, COI, CytB, etc), GC (GC content in %), annealing_temperature, Shark_Ray_Chimaera (Shark, Ray or Chimaera), Order (e.g., Carcharhiniformes, Lamniformes, etc), Family (e.g., Carcharhinidae, Lamnidae, etc), Genus (e.g., Carcharhinus, Alopias, etc), Species (e.g., Carcharhinus_leucas, Alopias_pelagicus, etc)
 
 **Scripts**
