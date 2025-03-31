@@ -5,7 +5,9 @@ This repository contains the code and data to reproduce all tables and figures p
 **General Information**
 
 Title of Dataset: DNA_rapid_tools
+
 Name: Ingrid Bunholi ORCID: 0000-0001-5489-276X Email: ingridbunholi@gmail.com
+
 Institution: University of Texas at Austin Marine Science Institute (UTMSI); Address: 750 Channel View Dr, Port Aransas, TX 78373
 
 **Details**
@@ -19,7 +21,9 @@ The elements of this project include:
 **Main metadata generation**
 
 *MatrixIRR.xlsx* - Raw metadata after the manual screening process used to rate the realiability of this review process and obtain the cleaned dataset
+
 *SNOWBALLING_base-cleaned.xlsx* - Raw metadata from snowballing search
+
 *combined_search_full-curated_31stMarch2025-FINAL.xlsx* - Filtered and curated metadata from both WoS search and snowballing process
 
 *More information about the metadata and curation process can be found in METHODOLOGICAL INFORMATION*
@@ -35,8 +39,11 @@ These files contain every metric collected from the 70 papers:
 **Scripts**
 
 IRRScript.R - Script used to rate the reliability of this review process (inter-rater agreement - IRR) and obtain the cleaned dataset.
+
 data_viz_fig1.R - Script used to generate figures 1A, 1B, and 1C
+
 data_viz_fig2.R - Script used to generate figures 2A, 2B, and 2C
+
 All the figures were generated using functions from packages described below. Additional graphical features were added in Illustrator.
 
 **METHODOLOGICAL INFORMATION**
