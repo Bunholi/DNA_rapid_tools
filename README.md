@@ -12,9 +12,12 @@ Institution: University of Texas at Austin Marine Science Institute (UTMSI); Add
 
 **Details**
 The elements of this project include:
-	1.	metadata: this folder includes two raw metadata necessary to run the scripts
-	2.	scripts: this folder includes all scripts to generate the figures and summary statistics
-	3.	output: this folder includes all outputs from the R-script - include figures and summary statistics
+
+	1.metadata: this folder includes two raw metadata necessary to run the scripts
+	
+	2.scripts: this folder includes all scripts to generate the figures and summary statistics
+	
+	3.output: this folder includes all outputs from the R-script - include figures and summary statistics
 
 **DATA & FILE OVERVIEW**
 
