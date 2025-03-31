@@ -1,18 +1,20 @@
+##############################################################
+#### Figure 1 - world map/time series/lolipop rapid tools ####
+##############################################################
+
 #Loading packages
 library(tidyverse)
 library(stringr)
-library(sf)
 library(ggplot2)
-library(packcircles)
+library(sf)
 library(maps)
 library(treemap)
 library(patchwork)
 library(RColorBrewer)
 library(cowplot)
-library(patchwork)
 
-#Setting directory
-setwd("/Users/ingridbunholi/Desktop/Bioinformatics/DNArapidtools/metadata")
+#Setting directory - path to your directory
+setwd("/Users/YourDirectory")
 
 #Setting metadata
 df<- read.csv("allsets_rapid_tools_v2.csv")
@@ -24,7 +26,7 @@ world_map<- map_data("world") #including Antarctica
 
 #Separating papers with more than 1 country (one each row)
 df.country.first<- df%>%
-  mutate(country = strsplit(as.character(Country_first_author_c), "; ")) %>%
+  mutate(country = strsplit(as.character(country_first_author_c), "; ")) %>%
   unnest(country)
 unique(df.country.first$country) 
 
@@ -37,16 +39,22 @@ map.country.first<- df.country.first %>%
   group_by(country) %>%
   summarise(count = n())
 
+map.country.first.2<- df.country.first %>%
+  group_by(country, application_primer_2) %>%
+  summarise(count = n())
+
+write.csv(map.country.first.2, "map.country.first.2.csv")
+
 #Example data preparation for donut plots
 donut_data <- df.country.first %>%
-  filter(country %in% c("USA", "Brazil", "Australia", "United Kingdom")) %>%
-  count(country, Application_primer_2) %>%
+  filter(country %in% c("USA", "Brazil", "Australia", "Mexico", "United Kingdom")) %>%
+  count(country, application_primer_2) %>%
   group_by(country) %>%
   mutate(percentage = n / sum(n) * 100)
 
 donut_data2 <- df.country.first %>%
   #filter(country %in% c("USA", "Brazil", "Australia", "China", "United Kingdom")) %>%
-  count(country, Application_primer_2) %>%
+  count(country, application_primer_2) %>%
   group_by(country) %>%
   mutate(percentage = n / sum(n) * 100)
 
@@ -57,7 +65,7 @@ category_colors <- c("lightpink", "deeppink4")
 
 #Create a grob for each country
 for (country in unique(donut_data$country)) {
-  p <- ggplot(donut_data %>% filter(country == !!country), aes(x = "", y = percentage, fill = Application_primer_2)) +
+  p <- ggplot(donut_data %>% filter(country == !!country), aes(x = "", y = percentage, fill = application_primer_2)) +
     geom_bar(width = 1, stat = "identity") +
     coord_polar(theta = "y") +
     scale_fill_manual(values = category_colors) +
@@ -88,9 +96,10 @@ map_plot <- ggplot(df.country.first) +
 
 #Define positions for the donut plots
 positions <- data.frame(
-  country = c("USA", "Brazil", "Australia", "United Kingdom"),
-  x = c(-100, -55, 135, 0), #this can be changed at illustrator 
-  y = c(40, -10, -25, 55))  
+  country = c("USA", "Brazil", "Australia", "Mexico", "United Kingdom"),
+  x = c(-100, -55, 135, -102, 0), #this can be changed in Illustrator
+  y = c(40, -10, -25, 23, 55))  
+
 
 #Add donut plots to the map plot
 for (i in 1:nrow(positions)) {
@@ -102,7 +111,7 @@ for (i in 1:nrow(positions)) {
 
 print(map_plot)
 
-ggsave('map_author_new.pdf', map_plot,
+ggsave('map_author_033125.pdf', map_plot,
        width = 21, height = 13, units = c('cm'),
        dpi = 600)
 
@@ -110,59 +119,80 @@ ggsave('map_author_new.pdf', map_plot,
 
 data<- df
 
-##Setting time series graphical elements
+#Counting DNA_RNA studies per year
+data_time<- data%>%
+  group_by(year, application_primer_2)%>%
+  summarise(count = n())
+
+#Convert year to numeric
+data_time$year <- as.numeric(as.character(data_time$year))
+
+#UNGROUP in case it's grouped from previous operations
+data_time <- data_time %>% ungroup()
+
+#Define full range of years
+year_range <- seq(min(data_time$year), max(data_time$year), by = 1)
+
+#Make sure both columns are present before completing
+data_time <- data_time %>%
+  complete(
+    year = year_range,
+    application_primer_2 = unique(data_time$application_primer_2),
+    fill = list(count = 0)
+  )
+
+#Find the first non-zero year per group
+first_years <- data_time %>%
+  filter(count > 0) %>%
+  group_by(application_primer_2) %>%
+  summarise(min_year = min(year), .groups = "drop")
+
+#Replace early zeros with NA to prevent flatlines
+data_time_filtered <- data_time %>%
+  left_join(first_years, by = "application_primer_2") %>%
+  mutate(count = ifelse(year < min_year, NA, count))
+
+#Setting time series graphical elements
 set<- theme(axis.text.x=element_text(angle=45,vjust = 0.9, hjust=1, size = 11),
-            axis.text.y=element_text(size = 11),
-            axis.ticks = element_line(linewidth = 0.5),
+            axis.text.y=element_text(size = 12),
             axis.title.y = element_text(size = 13, vjust = 2),
             legend.title = element_blank(),
             legend.text = element_blank())
 
-#Checking years
-unique(data$year)
-data$year<- as.character(data$year)
-
-#Counting DNA_RNA studies per year
-data_time<- data%>%
-  group_by(year, Application_primer_2)%>%
-  summarise(count = n())
-
-# Convert year to numeric
-data_time <- data_time %>%
-  mutate(year = as.numeric(year))
-
-#Plot time series eDNA/eRNA studies over time
-time<- ggplot(data_time, aes(x=year, y=count, color=Application_primer_2, group=Application_primer_2))+
-  geom_line(linewidth=1.5)+
-  geom_point()+
-  labs(x="", y="Number of studies")+
-  theme_classic()+
-  scale_x_continuous(breaks = c(2001, 2005, 2010, 2015, 2020, 2024)) +
-  #scale_x_discrete(breaks=data_time$year)+
-  scale_color_manual(values = c("deeppink4", "lightpink"))+
-  #scale_y_continuous(breaks =c(0,10,20,30,40,50,60,70,80))+
+#Plotting time series eDNA and Tissue DNA studies
+time<- ggplot(data_time_filtered, aes(x = year, y = count, color = application_primer_2)) +
+  geom_line(size = 1.2, na.rm = TRUE) +
+  geom_point(size = 2, na.rm = TRUE) +
+  scale_color_manual(values = c("deeppink4", "lightpink")) +
+  scale_x_continuous(
+    limits = c(2001, 2025),
+    breaks = c(2001, seq(2005, 2025, by = 5))
+  ) +
+  labs(x = NULL, y = "Number of studies", color = NULL) +
+  theme_minimal(base_size = 11) +
   set
+
 time
 #Saving plot
 ggsave('timeseries.pdf', time,
-       width = 9, height = 6, units = c('cm'),
+       width = 12, height = 9, units = c('cm'),
        dpi = 600)
 
 
-####Figure 1C - lollipop plot DNA rapid tools and application ####
+####Figure 1C - Lollipop plot - DNA rapid tools and application ####
 
 #Count occurrences of each "Rapid_DNAtools" for each "Application_primer"
 df_unique<- df%>%
-  separate_rows(Rapid_DNAtools_c, sep = "; ")
+  separate_rows(rapid_DNAtools_c, sep = "; ")
 
 data_counts_rp <- df_unique %>%
-  group_by(Rapid_DNAtools_c, Application_primer_2) %>%
+  group_by(rapid_DNAtools_c, application_primer_2) %>%
   summarise(count = n()) %>%
   ungroup()
 
 #Reshape the data for plotting
 data_wide_rp <- data_counts_rp %>%
-  pivot_wider(names_from = Application_primer_2, values_from = count, values_fill = list(count = 0))
+  pivot_wider(names_from = application_primer_2, values_from = count, values_fill = list(count = 0))
 
 data_wide_rp <- data_wide_rp %>%
   rename(V1 = eDNA, V2 = `Tissue DNA`)
@@ -172,11 +202,11 @@ desired_order<- c("on-site identification","RT-HRM-PCR", "rep-PCR", "Taxon-Speci
 
 #Convert Rapid_DNAtools_c to a factor with the specified levels
 data_wide_rp2 <- data_wide_rp %>%
-  mutate(Rapid_DNAtools_c = factor(Rapid_DNAtools_c, levels = desired_order))
+  mutate(rapid_DNAtools_c = factor(rapid_DNAtools_c, levels = desired_order))
 
 #lollipop plot
-rapid_loli_rp2 <- ggplot(data_wide_rp2, aes(x = Rapid_DNAtools_c)) +
-  geom_segment(aes(xend = Rapid_DNAtools_c, y = V2, yend = V1), color = "grey", size = 1) +
+rapid_loli_rp2 <- ggplot(data_wide_rp2, aes(x = rapid_DNAtools_c)) +
+  geom_segment(aes(xend = rapid_DNAtools_c, y = V2, yend = V1), color = "grey", size = 1) +
   geom_point(aes(y = V1, color = "eDNA"), size = 5) +
   geom_point(aes(y = V2, color = "Tissue"), size = 5) +
   geom_text(aes(y = V1, label = V1), vjust = -1, size = 4) +
@@ -190,13 +220,14 @@ rapid_loli_rp2 <- ggplot(data_wide_rp2, aes(x = Rapid_DNAtools_c)) +
     panel.grid.major.y = element_blank(),
     axis.text = element_text(size = 12),
     legend.title = element_blank(),
-    legend.text = element_text(size = 12),
-    legend.position = "right"
+    legend.text = element_blank()
   ) +
   ylim(0, max(data_wide_rp$V1, data_wide_rp$V2) * 1.1) +
   ylab("Paper Count") +
   xlab("")
 
+rapid_loli_rp2
+
 ggsave('rapid_application_lollipop.pdf', rapid_loli_rp2,
-       width = 20, height = 12, units = c('cm'),
+       width = 16, height = 10, units = c('cm'),
        dpi = 600)
