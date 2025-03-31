@@ -11,13 +11,14 @@ Name: Ingrid Bunholi ORCID: 0000-0001-5489-276X Email: ingridbunholi@gmail.com
 Institution: University of Texas at Austin Marine Science Institute (UTMSI); Address: 750 Channel View Dr, Port Aransas, TX 78373
 
 **Details**
+
 The elements of this project include:
 
-	1.metadata: this folder includes two raw metadata necessary to run the scripts
+	1.metadata: this folder includes three raw metadata necessary to run the scripts
 	
-	2.scripts: this folder includes all scripts to generate the figures and summary statistics
+	2.scripts: this folder includes all scripts to generate the cleaned metadata, figures and summary statistics
 	
-	3.output: this folder includes all outputs from the R-script - include figures and summary statistics
+	3.output: this folder includes all outputs from the R-script - include data generation, figures and summary statistics
 
 **DATA & FILE OVERVIEW**
 
